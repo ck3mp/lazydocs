@@ -1001,7 +1001,7 @@ def generate_docs(
             )
             assert spec is not None
             mod = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(mod)  # type: ignore
+            #spec.loader.exec_module(mod)  # type: ignore
 
             if mod:
                 module_md = generator.module2md(mod)
@@ -1016,66 +1016,66 @@ def generate_docs(
                     )
             else:
                 raise Exception(f"Failed to generate markdown for {path}")
-        # else:
-        #     # Path seems to be an import
-        #     obj = locate(path)
-        #     if obj is not None:
+        else:
+            # Path seems to be an import
+            obj = locate(path)
+            if obj is not None:
 
-        #         # TODO: function to get path to file whatever the object is
-        #         # if validate:
-        #         #     subprocess.call(
-        #         #         f"pydocstyle --convention=google {obj.__file__}", shell=True
-        #         #     )
-        #         if not stdout_mode:
-        #             print(f"Generating docs for python import: {path}")
+                # TODO: function to get path to file whatever the object is
+                # if validate:
+                #     subprocess.call(
+                #         f"pydocstyle --convention=google {obj.__file__}", shell=True
+                #     )
+                if not stdout_mode:
+                    print(f"Generating docs for python import: {path}")
 
-        #         if hasattr(obj, "__path__"):
-        #             # Object is a package
-        #             for loader, module_name, _ in pkgutil.walk_packages(
-        #                 path=obj.__path__,  # type: ignore
-        #                 prefix=obj.__name__ + ".",  # type: ignore
-        #             ):
-        #                 if _is_module_ignored(module_name, ignored_modules):
-        #                     # Add module to ignore list, so submodule will also be ignored
-        #                     ignored_modules.append(module_name)
-        #                     continue
+                if hasattr(obj, "__path__"):
+                    # Object is a package
+                    for loader, module_name, _ in pkgutil.walk_packages(
+                        path=obj.__path__,  # type: ignore
+                        prefix=obj.__name__ + ".",  # type: ignore
+                    ):
+                        if _is_module_ignored(module_name, ignored_modules):
+                            # Add module to ignore list, so submodule will also be ignored
+                            ignored_modules.append(module_name)
+                            continue
 
-        #                 try:
-        #                     mod = loader.find_module(module_name).load_module(  # type: ignore
-        #                         module_name
-        #                     )
-        #                     module_md = generator.module2md(mod)
+                        try:
+                            mod = loader.find_module(module_name).load_module(  # type: ignore
+                                module_name
+                            )
+                            module_md = generator.module2md(mod)
 
-        #                     if not module_md:
-        #                         # Module MD is empty -> ignore module and all submodules
-        #                         # Add module to ignore list, so submodule will also be ignored
-        #                         ignored_modules.append(module_name)
-        #                         continue
+                            if not module_md:
+                                # Module MD is empty -> ignore module and all submodules
+                                # Add module to ignore list, so submodule will also be ignored
+                                ignored_modules.append(module_name)
+                                continue
 
-        #                     if stdout_mode:
-        #                         print(module_md)
-        #                     else:
-        #                         to_md_file(
-        #                             module_md,
-        #                             mod.__name__,
-        #                             out_path=output_path,
-        #                             watermark=watermark,
-        #                         )
-        #                 except Exception as ex:
-        #                     print(
-        #                         f"Failed to generate docs for module {module_name}: "
-        #                         + repr(ex)
-        #                     )
-        #         else:
-        #             import_md = generator.import2md(obj)
-        #             if stdout_mode:
-        #                 print(import_md)
-        #             else:
-        #                 to_md_file(
-        #                     import_md, path, out_path=output_path, watermark=watermark
-        #                 )
-        #     else:
-        #         raise Exception(f"Failed to generate markdown for {path}.")
+                            if stdout_mode:
+                                print(module_md)
+                            else:
+                                to_md_file(
+                                    module_md,
+                                    mod.__name__,
+                                    out_path=output_path,
+                                    watermark=watermark,
+                                )
+                        except Exception as ex:
+                            print(
+                                f"Failed to generate docs for module {module_name}: "
+                                + repr(ex)
+                            )
+                else:
+                    import_md = generator.import2md(obj)
+                    if stdout_mode:
+                        print(import_md)
+                    else:
+                        to_md_file(
+                            import_md, path, out_path=output_path, watermark=watermark
+                        )
+            else:
+                raise Exception(f"Failed to generate markdown for {path}.")
 
     if overview_file and not stdout_mode:
         if not overview_file.endswith(".md"):
