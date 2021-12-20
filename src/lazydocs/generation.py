@@ -1001,7 +1001,7 @@ def generate_docs(
             )
             assert spec is not None
             mod = importlib.util.module_from_spec(spec)
-            #spec.loader.exec_module(mod)  # type: ignore
+            spec.loader.exec_module(mod)  # type: ignore
 
             if mod:
                 module_md = generator.module2md(mod)
